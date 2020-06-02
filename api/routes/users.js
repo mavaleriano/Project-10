@@ -82,7 +82,8 @@ router.get('/users', authenticateUser, (req, res) => {
   const user = req.currentUser;
 
   res.json({
-    name: `${user.firstName} ${user.lastName}`,
+    firstName: `${user.firstName}`, 
+    lastName: `${user.lastName}`,
     email: `${user.emailAddress}`,
   });
 });
@@ -92,18 +93,35 @@ router.get('/users', authenticateUser, (req, res) => {
 router.post('/users', [
   check('firstName')
     .exists()
-    .withMessage('"firstName" value is needed'),
+    .withMessage('"First Name" value is needed'),
   check('lastName')
     .exists()
-    .withMessage('"lastName" value is needed'),
-  check('emailAddress')
-    .exists()
-    .withMessage('"emailAddress" value is needed')
-    .isEmail()
-    .withMessage('Valid email address for "emailAddress" is needed'),
+    .withMessage('"Last Name" value is needed'),
   check('password')
-    .exists()
-    .withMessage('"password" value is needed')
+    .exists({ checkNull: true, checkFalsy: true }).not().isEmpty() //https://stackoverflow.com/questions/50252953/express-validator-does-not-catches-errors
+    .withMessage('Password value is needed')
+    .isLength({ min: 8, max: 20})
+    .withMessage('Please, be sure to provide a value for "password" that is between 8 and 20 characters in length'),
+  check('emailAddress')
+    .not().isEmpty()
+    .withMessage('"Email Address" value is needed')
+    .isEmail().normalizeEmail()
+    .withMessage('Make sure to include a valid email address'),
+  check('confirmPassword') // https://github.com/treehouse-projects/rest-api-validation-with-express/blob/master/completed-files/routes.js: 120-132
+    .exists({ checkNull: true, checkFalsy: true }).not().isEmpty()
+    .withMessage('Please confirm your password')
+    .custom((value, {req}) => { // If I don't leave value, I get error "Cannot read property 'body' of undefined"
+    // Only attempt to compare the `password` and `passwordConfirmation`
+    // fields if they have values.
+
+    if (req.body.password && req.body.confirmPassword && req.body.password !== req.body.confirmPassword) {
+      throw new Error('Please provide values for "password" and passwordConfirmation" that match');
+    }
+
+    // Return `true` so the default "Invalid value" error message
+    // doesn't get returned
+    return true;
+  }),
 ], asyncHandler(async (req,res) => {
   const errors = validationResult(req);
 

@@ -1,38 +1,48 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 import {
   BrowserRouter as Router,
   Route,
   Switch
 } from 'react-router-dom';
-import { Component } from 'react';
 
-class App extends Component {
-  constructor() {
-    super()
-  }
-  componentWillMount() {
-    this.getData()
-  }
+import Header from './components/Header';
+import Public from './components/Public';
+import NotFound from './components/NotFound';
+import UserSignUp from './components/UserSignUp';
+import UserSignIn from './components/UserSignIn';
+import UserSignOut from './components/UserSignOut';
+import Authenticated from './components/Authenticated';
+import PrivateRoute from './PrivateRoute';
+import Courses from './components/Courses';
 
-  async getData() {
-    const response =
-      await fetch("http://localhost:5000/api/courses",
-        { headers: {'Content-Type': 'application/json'}}
-      )
-    console.log(await response.json())
-  }
+ // New import
+ import withContext from './Context'; // This is what we're going to use to make sure values are available throughout the app
+ 
+ const HeaderWithContext = withContext(Header);
+ const UserSignUpWithContext = withContext(UserSignUp); // without having to send through props
+ const UserSignInWithContext = withContext(UserSignIn);
+ const AuthWithContext = withContext(Authenticated);
+ const UserSignOutWithContext = withContext(UserSignOut);
+ const CoursesWithContext = withContext(Courses);
 
-  render(){
-    return (
-      <div>
-        <p>Hello World</p>
-      </div>
-    )
-  }
-}
+/*
+When React renders a component that subscribes to context, it will read the context value passed to it from its Provider.
+In context, I first added a value object to the provider and now that value will be shared through Context (its a wrapper!)
+*/
+export default () => (
+  <Router>
+    <div>
+      <HeaderWithContext />
 
-
-
-export default App;
+      <Switch>
+        <Route exact path="/" component={Public} />
+        <PrivateRoute path="/authenticated" component={AuthWithContext} />
+        <PrivateRoute path="/courses" component={CoursesWithContext} /> 
+        <Route path="/signin" component={UserSignInWithContext} />
+        <Route path="/signup" component={UserSignUpWithContext} />
+        <Route path="/signout" component={UserSignOutWithContext} />
+        <Route component={NotFound} />
+      </Switch>
+    </div>
+  </Router>
+);
