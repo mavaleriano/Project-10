@@ -154,13 +154,13 @@ router.post('/users', [
 }));
 
 // Created this just to get rid of excess users being created for testing
-/*
+
 router.delete('/users', asyncHandler(async (req, res) => {
   let user;
   user = await User.findOne({ where: { emailAddress: req.body.emailAddress } });
   await user.destroy();
   res.status(204).end();
 }));
-*/
+
 
 module.exports = router;
