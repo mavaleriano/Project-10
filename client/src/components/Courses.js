@@ -16,7 +16,7 @@ export default class Courses extends Component {
 
       this.state = {
         Courses: [],
-        errors: []
+        //errors: []
       };
    }
 
@@ -46,8 +46,8 @@ export default class Courses extends Component {
    }
 
    render(){
-      const { errors } = this.state;
-
+      //const { errors } = this.state;
+      // https://www.storyblok.com/tp/react-dynamic-component-from-json
       return(
          <div className="bounds">
             {this.state.Courses.map(course => this.courseBlock(course))}
