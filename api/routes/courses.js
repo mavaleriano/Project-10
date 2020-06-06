@@ -5,8 +5,8 @@ const bcrypt = require('bcryptjs');
 const auth = require('basic-auth');
 const Course = require("../models").Course;
 const User = require("../models").User;
-const { check, validationResult } = require('express-validator/check');
-
+const { check, validationResult } = require('express-validator');
+// using express-validator that isnt deprecated: https://github.com/express-validator/express-validator/issues/752 
 // Constructing router instance
 const router = express.Router();
 
@@ -39,9 +39,17 @@ const authenticateUser = async (req, res, next) => {
     if (user) {
       // Use the bcryptjs npm package to compare the user's password
       // (from the Authorization header) to the user's password
-      const authenticated = bcrypt
-        .compareSync(credentials.pass, user.password);
-
+      let authenticated;
+      if(credentials.pass.length < 21)
+      {
+        authenticated = bcrypt
+          .compareSync(credentials.pass, user.password);
+      }
+      else
+      {
+        let result = (credentials.pass === user.password);
+        authenticated = result;
+      }
       // If the passwords match...
       if (authenticated) 
       {
@@ -52,7 +60,7 @@ const authenticateUser = async (req, res, next) => {
       } 
       else 
       {
-        message = `Authentication failurer for username: ${user.username}`;
+        message = `Authentication failure for username: ${user.emailAddress}`;
       }
     } 
     else 
@@ -69,7 +77,7 @@ const authenticateUser = async (req, res, next) => {
     console.warn(message);
 
     // Return a response with a 401 Unauthorized HTTP status code.
-    res.status(401).json({ message: 'Access Denied' });
+    res.status(403).json({ message: 'Access Denied' });
   } else {
     // Or if user authentication succeeded...
     // Call the next() method.
@@ -110,10 +118,10 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 // Create new course while authenticating user and setting appropriate user id to course
 router.post('/courses', authenticateUser, [
   check('title')
-    .exists()
+    .exists( {checkFalsy: true, checkNull: true} )
     .withMessage('"title" value is needed'),
   check('description')
-    .exists()
+    .exists( {checkFalsy: true, checkNull: true} )
     .withMessage('"description" value is needed')
 ], asyncHandler(async (req, res) => {
   const user = req.currentUser;

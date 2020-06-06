@@ -3,7 +3,7 @@ import config from './config';
 export default class Data {
   api(path, method = 'GET', body = null, requiresAuth = false, credentials = null) {
     const url = config.apiBaseUrl + path;
-  
+
     const options = {
       method,
       headers: {
@@ -22,7 +22,7 @@ export default class Data {
 
       options.headers['Authorization'] = `Basic ${encodedCredentials}`;
     }
-
+    console.log(options);
     return fetch(url, options);
   }
 
@@ -74,6 +74,67 @@ export default class Data {
     else if (response.status === 400) {
       return response.json().then(data => {
         console.log(data.errors);
+        return data.errors;
+      });
+    }
+    else {
+      throw new Error();
+    }
+  }
+
+  async createCourse(user, course) {
+    let username = user.username;
+    let password = user.password;
+    
+    const response = await this.api('/courses', 'POST', course, true, {username, password});
+    if (response.status === 201) {
+      console.log('This worked!');
+
+      return [];
+    }
+    else if (response.status === 400) {
+      return response.json().then(data => {
+        console.log(data.errors);
+        return data.errors;
+      });
+    }
+    else {
+      throw new Error();
+    }
+  }
+
+  async updateCourse(user, course, path) {
+    let username = user.username;
+    let password = user.password;
+    
+    const response = await this.api(path, 'PUT', course, true, {username, password});
+    if (response.status === 204) {
+      console.log('This worked!');
+
+      return [];
+    }
+    else if (response.status === 403) {
+      return response.json().then(data => {
+        window.alert(data.message);
+        return data.errors;
+      });
+    }
+    else {
+      throw new Error();
+    }
+  }
+
+  async destroyCourse(username, password, path){
+    const response = await this.api(path, 'DELETE', null, true, {username, password});
+    
+    if (response.status === 204) {
+      console.log('Deleteddd!');
+      return 204;
+    }
+    else if (response.status === 403)
+    {
+      return response.json().then(data => {
+        window.alert(data.message);
         return data.errors;
       });
     }

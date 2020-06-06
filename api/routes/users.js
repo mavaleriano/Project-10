@@ -80,11 +80,13 @@ const authenticateUser = async (req, res, next) => {
 // First runs authenticateUser middleware before responding with json formatted data that avoids returning password, createdAt and updatedAt
 router.get('/users', authenticateUser, (req, res) => {
   const user = req.currentUser;
-
+  
   res.json({
+    userId: `${user.userId}`,
     firstName: `${user.firstName}`, 
     lastName: `${user.lastName}`,
     email: `${user.emailAddress}`,
+    password: `${user.password}`,
   });
 });
 

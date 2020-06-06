@@ -27,11 +27,16 @@ export default class Courses extends Component {
 
    // Retrieves the courses and sets this to state
    getCourses = async () => {
-      const courses = await this.data.getCourses();
-      this.setState({
-         Courses: courses
-      });
-      console.log(courses); //LOGGGGGGGGGGGGGGGGGGGGGGGing
+      try{
+         const courses = await this.data.getCourses();
+         this.setState({
+            Courses: courses
+         });
+         console.log(courses); //LOGGGGGGGGGGGGGGGGGGGGGGGing
+      }
+      catch(error) {
+         console.log(error);
+      }
    }
 
    // Returns each block for the dynamic courses
