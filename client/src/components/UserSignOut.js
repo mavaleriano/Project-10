@@ -2,9 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 
 export default ({ context }) => {
-  console.log('STEP BEFORE');
-  context.actions.signOut();
-  console.log('STEP AFTER');
+  setTimeout(function(){ context.actions.signOut(); }, 100); // Adding this to avoid the below warning
   
   return (
     <Redirect to="/courses" />
