@@ -33,8 +33,11 @@ class Courses extends Component {
          });
       }
       catch(error) {
-         console.log(error);
-         this.props.history.push('/notfound');
+         console.log(error.message);
+         if (error.message === "Failed to fetch")
+         {
+            this.props.history.push('/error');
+         }
       }
    }
 

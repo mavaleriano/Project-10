@@ -47,17 +47,32 @@ class CourseDetail extends Component {
    getCourse = async (path) => {
       try {
          const course = await this.data.getCourse(path);
-         this.setState({
-            Course: course,
-            id: course.id,
-            firstName: course.User.firstName,
-            lastName: course.User.lastName,
-            emailAddress: course.User.emailAddress
-         }, () => this.verifyUser()); //Making sure to call here so that this function only runs once needed variables have been correctly set to verify userId and authUser match
+         if (course.message !== "Failed to fetch")
+         {
+            this.setState({
+               Course: course,
+               id: course.id,
+               firstName: course.User.firstName,
+               lastName: course.User.lastName,
+               emailAddress: course.User.emailAddress
+            }, () => this.verifyUser()); //Making sure to call here so that this function only runs once needed variables have been correctly set to verify userId and authUser match
+         }
+         else
+         {
+            throw new Error("Failed to fetch");
+         }
       }
       catch(error)
       {
-         this.props.history.push('/notfound');
+         console.log(error);
+         if (error.message === "Failed to fetch")
+         {
+            this.props.history.push('/error');
+         }
+         else
+         {
+            this.props.history.push('/notfound');
+         }
       }
    }
    

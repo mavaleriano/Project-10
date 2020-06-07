@@ -95,29 +95,31 @@ router.get('/users', authenticateUser, (req, res) => {
 router.post('/users', [
   check('firstName')
     .exists()
-    .withMessage('"First Name" value is needed'),
+    .withMessage('"First Name" is needed'),
   check('lastName')
     .exists()
-    .withMessage('"Last Name" value is needed'),
-  check('password')
-    .exists({ checkNull: true, checkFalsy: true }).not().isEmpty() //https://stackoverflow.com/questions/50252953/express-validator-does-not-catches-errors
-    .withMessage('Password value is needed')
-    .isLength({ min: 8, max: 20})
-    .withMessage('Please, be sure to provide a value for "password" that is between 8 and 20 characters in length'),
+    .withMessage('"Last Name" is needed'),
   check('emailAddress')
     .not().isEmpty()
-    .withMessage('"Email Address" value is needed')
+    .withMessage('"Email address" is needed')
+    .if(check('emailAddress').not().isEmpty())
     .isEmail().normalizeEmail()
     .withMessage('Make sure to include a valid email address'),
+  check('password')
+    .exists({ checkNull: true, checkFalsy: true }) //https://stackoverflow.com/questions/50252953/express-validator-does-not-catches-errors
+    .withMessage('Password value is needed')
+    .if(check('password').exists({ checkNull: true, checkFalsy: true }))
+    .isLength({ min: 8, max: 20})
+    .withMessage('Please, be sure to provide a value for "password" that is between 8 and 20 characters in length'),
   check('confirmPassword') // https://github.com/treehouse-projects/rest-api-validation-with-express/blob/master/completed-files/routes.js: 120-132
-    .exists({ checkNull: true, checkFalsy: true }).not().isEmpty()
+    .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please confirm your password')
     .custom((value, {req}) => { // If I don't leave value, I get error "Cannot read property 'body' of undefined"
     // Only attempt to compare the `password` and `passwordConfirmation`
     // fields if they have values.
 
     if (req.body.password && req.body.confirmPassword && req.body.password !== req.body.confirmPassword) {
-      throw new Error('Please provide values for "password" and passwordConfirmation" that match');
+      throw new Error('Please provide values for "password" and password confirmation" that match');
     }
 
     // Return `true` so the default "Invalid value" error message
