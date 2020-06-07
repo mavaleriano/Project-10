@@ -137,7 +137,8 @@ router.post('/users', [
       const tempUser = await User.findOne( {where: {emailAddress: req.body.emailAddress} });
       if (tempUser)
       {
-        res.status(400).json({ ExistingUser: "emailAddress value has already been used"});
+        const errorMessages = ["emailAddress value has already been used"];
+        res.status(400).json({ errors: errorMessages });
       }
       else
       {

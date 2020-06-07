@@ -18,7 +18,7 @@ export class Provider extends Component {
 
   render() {
 
-    const { authenticatedUser } = this.state;
+    const { authenticatedUser } = this.state; // Getting authenticated user from state
 
     const value = {
       authenticatedUser,
@@ -36,10 +36,10 @@ export class Provider extends Component {
     );
   }
 
-  
+  // Signs user in and makes sure that it isnt an empty or false user before setting it to global user and saving this to Cookies
   signIn = async (username, password) => {
     const user = await this.data.getUser(username, password);
-    if (user !== null) 
+    if (user !== null && user !== 401) 
     {
       this.setState(() => {
         return {

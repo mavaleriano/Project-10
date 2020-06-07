@@ -7,35 +7,34 @@
 
 import React, { Component } from 'react';
 import Data from '../Data';
-//import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
-export default class Courses extends Component {
+class Courses extends Component {
    constructor() {
       super();
       this.data = new Data();
 
       this.state = {
         Courses: [],
-        //errors: []
       };
    }
 
-   // Calling this.getCourses to load the updated API courses
+   // Calling this.getCourses to load the courses directly from API
    componentDidMount(){
       this.getCourses();
    }
 
-   // Retrieves the courses and sets this to state
+   // Retrieves the courses and sets this to state, if no courses returned then redirects to /notfound
    getCourses = async () => {
       try{
          const courses = await this.data.getCourses();
          this.setState({
             Courses: courses
          });
-         console.log(courses); //LOGGGGGGGGGGGGGGGGGGGGGGGing
       }
       catch(error) {
          console.log(error);
+         this.props.history.push('/notfound');
       }
    }
 
@@ -51,8 +50,7 @@ export default class Courses extends Component {
    }
 
    render(){
-      //const { errors } = this.state;
-      // https://www.storyblok.com/tp/react-dynamic-component-from-json
+      //Used this for idea of using map to render the multiple courses: https://www.storyblok.com/tp/react-dynamic-component-from-json
       return(
          <div className="bounds">
             {this.state.Courses.map(course => this.courseBlock(course))}
@@ -66,3 +64,5 @@ export default class Courses extends Component {
       );
    }
 }
+
+export default withRouter(Courses);

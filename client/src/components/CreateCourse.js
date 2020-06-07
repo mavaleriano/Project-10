@@ -24,6 +24,7 @@ export default class CreateCourse extends Component {
     newError: false,
   }
 
+  // On mount, sets the user information which is used later on to sync that user info to the course
   componentDidMount(){
     const { context } = this.props;
 
@@ -35,6 +36,7 @@ export default class CreateCourse extends Component {
     });
   }
 
+  // Prints out the validation errors
   ErrorsDisplay( errors ) {
     let errorsDisplay = null;
     
@@ -53,6 +55,7 @@ export default class CreateCourse extends Component {
     return errorsDisplay;
   }
 
+  // Redirects upon cancel
   handleSubmit (e) {
     e.preventDefault();
     return (
@@ -108,6 +111,7 @@ export default class CreateCourse extends Component {
     );
   }
 
+  // Handles the changing state values of the inputs in the render
   change = (event) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -122,6 +126,7 @@ export default class CreateCourse extends Component {
   submit = (event) => {
     const { context } = this.props;
     event.preventDefault();
+
     //Destructuring required values from state
     const {
       emailAddress,
@@ -155,13 +160,12 @@ export default class CreateCourse extends Component {
         {
           console.log('Course created!');
           this.setState({ newError: false });
-          //let id = 
           this.props.history.push('/courses');
         }
       })
       .catch( err => {
         console.log(err.name);
+        this.props.history.push('/error');
       })
-    console.log("Submitted! --Past!");
   }
 }

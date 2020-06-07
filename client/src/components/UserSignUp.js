@@ -78,6 +78,7 @@ export default class UserSignUp extends Component {
     );
   }
 
+  // Changing state to re-render form
   change = (event) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -89,6 +90,7 @@ export default class UserSignUp extends Component {
     });
   }
 
+  // Handles submitting new user
   submit = () => {
     const { context } = this.props;
 
@@ -118,7 +120,7 @@ export default class UserSignUp extends Component {
         {
           context.actions.signIn(emailAddress, password) // changed this from emailAddress -> emailAddress
             .then(() => {
-              this.props.history.push('/authenticated');
+              this.props.history.push('/courses');
             });
         }
       })
@@ -129,6 +131,6 @@ export default class UserSignUp extends Component {
   }
 
   cancel = () => {
-    this.props.history.push('/');
+    this.props.history.push('/courses');
   }
 }

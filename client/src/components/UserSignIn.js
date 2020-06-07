@@ -58,6 +58,7 @@ export default class UserSignIn extends Component {
     );
   }
 
+  // Updates state as you change the input fields above in the rendering. Gets the input field (name) and then sets state of it
   change = (event) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -69,13 +70,14 @@ export default class UserSignIn extends Component {
     });
   }
 
-  submit = () => {
+  // Gathers the information from form field to sign user in, if unsuccessful shows validation errors, otherwise, directs you automatically to /courses
+  submit = (e) => {
     const { context } = this.props;
-    const { from } = this.props.location.state || { from: { pathname: '/authenticated'} };
+    const { from } = this.props.location.state || { from: { pathname: '/courses'} };
     const {username, password } = this.state;
     context.actions.signIn(username, password)
       .then( user => {
-        if (user === null) 
+        if (user === null || user === 401) 
         {
           this.setState(() => {
             return { errors: [ 'Sign-in was unsuccessful' ]};

@@ -2,12 +2,15 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 
 export default ({ context }) => {
+  console.log('STEP BEFORE');
   context.actions.signOut();
+  console.log('STEP AFTER');
   
   return (
-    <Redirect to="/" />
+    <Redirect to="/courses" />
   );
 }
+
 /* Getting Cannot update during an existing state transition:
 in Unknown (at Context.js:73)
     in ContextComponent (created by Context.Consumer)

@@ -11,6 +11,7 @@ class UpdateCourse extends Component {
 
     this.state = {
       id: '',
+      authUser: '',
       Course: '',
       firstName: '',
       lastName: '',
@@ -22,7 +23,8 @@ class UpdateCourse extends Component {
       estimatedTime: '',
       materialsNeeded: '',
       newError: false,
-      errors: ''
+      errors: '',
+      verified: ''
     };
  }
 
@@ -31,11 +33,11 @@ class UpdateCourse extends Component {
    const { location } = this.props;
    const { context } = this.props;
    let path = location.pathname;
-   this.getCourse(path);
    this.setState({
-       password: (context.authenticatedUser ? context.authenticatedUser.password : null),
+      password: (context.authenticatedUser ? context.authenticatedUser.password : null),
+      authUser: (context.authenticatedUser ? context.authenticatedUser.email : null),
       path,
-   });
+   }, () => this.getCourse(path));
  }
 
  // Retrieves the courses and sets this to state
@@ -56,14 +58,33 @@ class UpdateCourse extends Component {
        estimatedTime: course.estimatedTime,
        materialsNeeded: course.materialsNeeded,
        path: actualPath
-    });
-    console.log(course); //LOGGGGGGGGGGGGGGGGGGGGGGGing
+    }, () => this.verifyUser());
   }
   catch(error){
     console.log(error);
+    if (this.state.Course === 500)
+    {
+      this.props.history.push('/error');
+    }
+    else
+    {
+      this.props.history.push('/notfound');
+    }
   }
  }
 
+ verifyUser () {
+  if(this.state.authUser === this.state.emailAddress)
+  {
+     this.setState({verified: true});
+  }
+  else 
+  {
+    this.props.history.push('/forbidden');
+  }
+}
+
+ // Returns the validation errors appropriately
  ErrorsDisplay( errors ) {
   let errorsDisplay = null;
   
@@ -82,6 +103,7 @@ class UpdateCourse extends Component {
   return errorsDisplay;
 }
 
+// If cancel, return to course detail page
 handleSubmit (e) {
   e.preventDefault();
   let path = this.state.id;
@@ -94,7 +116,7 @@ handleSubmit (e) {
       lastName,
       errors
     } = this.state;
-    //console.log(this.state.Course.description);
+   
     return(
       <div className="bounds course--detail">
         <h1>Update Course</h1>
@@ -132,6 +154,7 @@ handleSubmit (e) {
     );
   }
 
+  // Updating state to change to re-render
   change = (event) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -147,6 +170,7 @@ handleSubmit (e) {
     const { context } = this.props;
     event.preventDefault();
     let path = `/courses/${this.state.id}`;
+
     //Destructuring required values from state
     const {
       emailAddress,
@@ -171,23 +195,23 @@ handleSubmit (e) {
 
     context.data.updateCourse(user, course, path)
       .then( errors => {
-        if (errors.length)
+        if (errors.length) // if there's errors
         {
-          let returnedErrors = this.ErrorsDisplay(errors);
-          this.setState({ errors: returnedErrors, newError: true });
+          let returnedErrors = this.ErrorsDisplay(errors); //Get the HTML for the validation errors
+          this.setState({ errors: returnedErrors, newError: true }); // Set those errors to state to be show upon re-render
         }
         else
         {
           console.log('Course updated!');
-          this.setState({ newError: false });
+          this.setState({ newError: false }); // Reset newError to false to make sure validation error field isn't visible
 
-          this.props.history.push('/courses/' + this.state.id);
+          this.props.history.push('/courses/' + this.state.id); // Upon update, return to updated course detail page
         }
       })
       .catch( err => {
-        console.log(err.name);
+        console.log(err);
+        this.props.history.push('/error'); // Otherwise redirect to error page
       })
-    console.log("Submitted! --Past!");
   }
 }
 

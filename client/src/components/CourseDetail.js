@@ -27,7 +27,6 @@ class CourseDetail extends Component {
         path: '',
         authUser: '',
         verified: false,
-        is_Mounted: false
       };
    }
 
@@ -41,23 +40,28 @@ class CourseDetail extends Component {
         password: (context.authenticatedUser ? context.authenticatedUser.password : null),
         authUser: (context.authenticatedUser ? context.authenticatedUser.email : null),
         path,
-        is_Mounted: true
      }, () => this.getCourse(path));
    }
 
-   // Retrieves the courses and sets this to state
+   // Retrieves the courses and sets this to state along with needed variables, else redirects to /notfound
    getCourse = async (path) => {
-      const course = await this.data.getCourse(path);
-      this.setState({
-         Course: course,
-         id: course.id,
-         firstName: course.User.firstName,
-         lastName: course.User.lastName,
-         emailAddress: course.User.emailAddress
-      }, () => this.verifyUser());
-      console.log(course); //LOGGGGGGGGGGGGGGGGGGGGGGGing
+      try {
+         const course = await this.data.getCourse(path);
+         this.setState({
+            Course: course,
+            id: course.id,
+            firstName: course.User.firstName,
+            lastName: course.User.lastName,
+            emailAddress: course.User.emailAddress
+         }, () => this.verifyUser()); //Making sure to call here so that this function only runs once needed variables have been correctly set to verify userId and authUser match
+      }
+      catch(error)
+      {
+         this.props.history.push('/notfound');
+      }
    }
-
+   
+   // Erases a course: first asks for confirmation to make sure user is sure then redirects depending on returned response
    deleteCourse = async (e) => {
       e.preventDefault();
       if(window.confirm("Are you sure you want to delete this course? There is no going back!"))
@@ -68,68 +72,26 @@ class CourseDetail extends Component {
             console.log('Course deleted!');
             this.props.history.push('/courses');
          }
+         else
+         {
+            console.log(toErase);
+            this.props.history.push('/error');
+         }
       }
    }
 
+   // Checks to make sure that the authenticatedUser (user that is logged in) is the same as the author of the course: Helps in rendering of update/delete button
    verifyUser () {
-      console.log(this.state.authUser + " OR " + this.state.emailAddress);
       if(this.state.authUser === this.state.emailAddress)
       {
          this.setState({verified: true});
       }
    }
-   /*
-      Suggestion to use try catch: https://stackoverflow.com/questions/50180344/unexpected-token-u-in-json-at-position-0-but-only-sometimes/50180478#:~:text=That%20unexpected%20%22u%22%20is%20the,that%20isn't%20loaded%20yet.
-      It might seem funny.. but finalizing this one function took me like.. 5 hrs. I really wanted to make it work
-      -At first I thought I needed to use JSON.stringify and then I tried using jsonata
-   
-   formatJSON = (data) => {
-      try{
-         let regex = /\n\n/igm; //Sets the regular expression for finding the \n\n in the text
-         let newData = data.replace(regex, '</p><p>'); // Replaces those \n\n with p
-         let finalData = '<p>'+newData+'</p>'; // Adds opening and closing p tags
-         return finalData;
-      }
-      catch (error)
-      {
-         return null;
-      }
-   }*/
 
-   // Returns list of materials: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split
-   // materialsList(mat) {
-   //    try {
-   //       let regex = /\n/igm; //Sets the regular expression for finding the \n\n in the text
-   //       let regexx = /\*/igm
-   //       mat = mat.replace(regexx, '');
-   //       const matList = mat.replace(regex, '</li><li>');
-   //       let finalListt = '<li>'+matList+'</li>' // Had to add this because an extra li tag showed so added </li> to differentiate it from the rest
-   //       let finalList = finalListt.replace('<li></li>', '');
-         
-   //       console.log(matList);
-   //       return finalList;
-   //    }
-   //    catch (error)
-   //    {
-   //       return null;
-   //    }
-   // }
-
+   // Using ReactMarkdown to display certain values, as requested for project requirements
    render(){
-      let Path = `${this.state.path}/update`;
-      let name = `${this.state.firstName} ${this.state.lastName}`;
-      // let desc;
-      // let materials;
-      // if(this.state.is_Mounted)
-      // {
-      //    desc = this.formatJSON(this.state.Course.description);
-      //    materials = this.materialsList(this.state.Course.materialsNeeded);
-      // }
-
-      // if(this.state.is_Mounted)
-      // {
-      //    let verified = this.verifyUser();
-      // }
+      let Path = `${this.state.path}/update`; //Sets correct path for edit redirect
+      let name = `${this.state.firstName} ${this.state.lastName}`; // Just easier to type {name}
 
       return(
          <div>
@@ -148,7 +110,6 @@ class CourseDetail extends Component {
                      <p>By {name}</p>
                   </div>
                   <div className="course--description">
-                     {/* <div dangerouslySetInnerHTML={{ __html: desc }} /> */}
                      <ReactMarkdown source={this.state.Course.description} />
                   </div>
                </div>
@@ -158,13 +119,11 @@ class CourseDetail extends Component {
                         <li className="course--stats--list--item">
                            <h4>Estimated Time</h4>
                            <h3>{this.state.Course.estimatedTime ? this.state.Course.estimatedTime
-                           : "No specified time"}</h3>
+                           : <ReactMarkdown source="_No specified time_" />} </h3>
                         </li>
                         <li className="course--stats-list--item">
                            <h4>Materials Needed</h4>
                            <ul>
-                              {/* {materials ? <div dangerouslySetInnerHTML={{ __html: materials }} />
-                              : "None required"} */}
                               <ReactMarkdown source={this.state.Course.materialsNeeded} />
                            </ul>
                         </li>
