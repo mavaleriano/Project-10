@@ -7,23 +7,26 @@
 */
 
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
-export default class CreateCourse extends Component {
-  
-  state = {
-    firstName: '',
-    lastName: '',
-    emailAddress: '',
-    password: '',
-    title: '',
-    description: '',
-    estimatedTime: '',
-    materialsNeeded: '',
-    errors: '',
-    newError: false,
+class CreateCourse extends Component {
+  constructor() {
+    super();
+    this.handleSubmit = this.handleSubmit.bind(this);
+    
+    this.state = {
+      firstName: '',
+      lastName: '',
+      emailAddress: '',
+      password: '',
+      title: '',
+      description: '',
+      estimatedTime: '',
+      materialsNeeded: '',
+      errors: '',
+      newError: false,
+    }
   }
-
   // On mount, sets the user information which is used later on to sync that user info to the course
   componentDidMount(){
     const { context } = this.props;
@@ -58,9 +61,7 @@ export default class CreateCourse extends Component {
   // Redirects upon cancel
   handleSubmit (e) {
     e.preventDefault();
-    return (
-      <Redirect to="/courses" />
-    );
+    this.props.history.push('/courses');
   }
 
   render(){
@@ -169,3 +170,5 @@ export default class CreateCourse extends Component {
       })
   }
 }
+
+export default withRouter(CreateCourse);

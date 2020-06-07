@@ -7,7 +7,7 @@ class UpdateCourse extends Component {
     super();
     this.data = new Data();
 
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this); // Using this to fix error in handleSubmit function
 
     this.state = {
       id: '',
