@@ -3,13 +3,12 @@
 
 # Running the app
   Open two terminals, in one move to root folder for client, in other to root folder for api
-  - For api (in terminal): run 'npm install' (to install dependencies)
-    `npm install`
-    run 'npm start' to run program
-    `npm start`
-  - For client (in other terminal): run 'npm install'  (to install dependencies)
-    `npm start`
-    run 'npm start' to run program
-    `npm start`
+  - For api (in terminal): 
+    1. run `npm install` (to install dependencies)
+    2. run `npm start` to run program
+  - For client (in other terminal): 
+    1. run `npm install`  (to install dependencies)
+    2. run `npm start` to run program
+    
     This should open localhost:3000 in browser!
 
